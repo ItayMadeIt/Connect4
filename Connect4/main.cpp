@@ -2,14 +2,17 @@
 #include <vector>
 #include <SDL.h>
 #include <SDL_image.h>
+#include "Board.h"
 
 using namespace std;
 
 static int SQUARE_SIZE = 100;
 static int PIECE_SIZE = 90;
 
-static int WIDTH = 7 * SQUARE_SIZE;
-static int HEIGHT = 7 * SQUARE_SIZE;
+static int GRID_WIDTH = 7;
+static int GRID_HEIGHT = 6;
+static int WIDTH = (GRID_WIDTH) * SQUARE_SIZE;
+static int HEIGHT = (GRID_HEIGHT + 1) * SQUARE_SIZE;
 
 static SDL_Color redPlayerC = { 255, 0, 0, 255 };
 static SDL_Color bluePlayerC = { 0, 0, 255, 255 };
@@ -72,7 +75,7 @@ static void DrawCircle(SDL_Renderer* renderer, SDL_Point center, int radius)
     SDL_RenderDrawPoints(renderer, points, drawCount);
     delete[] points;
 }
-void DrawFilledCircle(SDL_Renderer* renderer, SDL_Point center, int radius)
+static void DrawFilledCircle(SDL_Renderer* renderer, SDL_Point center, int radius)
 {
     const int arrSize = static_cast<int>(M_PI * radius * radius);
     SDL_Point* points = new SDL_Point[arrSize];
@@ -97,6 +100,21 @@ void DrawFilledCircle(SDL_Renderer* renderer, SDL_Point center, int radius)
     SDL_RenderDrawPoints(renderer, points, arrSize);
 
     delete[] points;
+}
+
+static void DrawBackground(SDL_Color bgColor, int width, int height) {
+
+    SDL_SetRenderDrawColor(renderer, bgColor.r, bgColor.g, bgColor.b, 255);
+
+    for (size_t i = 0; i < 7; i++)
+    {
+        for (size_t j = 0; j < 6; j++)
+        {
+            SDL_Point p = { i * SQUARE_SIZE + SQUARE_SIZE / 2, (6 - j) * SQUARE_SIZE + SQUARE_SIZE / 2 };
+            DrawFilledCircle(renderer, p, PIECE_SIZE / 2);
+        }
+    }
+
 }
 int main(int argc, char* argv[]) {
     // Initialize SDL
@@ -128,16 +146,16 @@ int main(int argc, char* argv[]) {
     }
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-    SDL_Surface* backgroundSurf = IMG_Load("Assets/Connect4Background.png");
-    SDL_Texture* background = SDL_CreateTextureFromSurface(renderer, backgroundSurf);
-    SDL_FreeSurface(backgroundSurf);
-
     bool running = true;
 
     SDL_Rect backgroundRect = { 0, SQUARE_SIZE, WIDTH, HEIGHT - SQUARE_SIZE};
 
+    Board* b = new Board();
+
     while (running) {
         // Input
+        SDL_GetMouseState(&mousePos.x, &mousePos.y);
+
         while (SDL_PollEvent(&event)) {
 
             if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
@@ -147,27 +165,47 @@ int main(int argc, char* argv[]) {
             if (event.type == SDL_QUIT) {
                 running = false;
             }
-        }
-        SDL_GetMouseState(&mousePos.x, &mousePos.y);
+            if (event.button.button == SDL_BUTTON_LEFT && event.type == SDL_MOUSEBUTTONDOWN) {
+                Move m;
+                m.c = Red;
+                m.x = static_cast<int>(mousePos.x / SQUARE_SIZE) + 1;
+                b->MakeMove(b->board, m);
+            }
 
-        
+        }
+        SDL_Point piece = { static_cast<int>(mousePos.x / SQUARE_SIZE) * SQUARE_SIZE + SQUARE_SIZE / 2, SQUARE_SIZE / 2 };
+
+        for (size_t i = 0; i < 7 * 6; i++)
+        {
+            SDL_SetRenderDrawColor(renderer, redPlayerC.r, redPlayerC.g, redPlayerC.b, 255);
+
+            if (b->board.red.test(i)) {
+                piece.x = i % 7;
+                piece.y = i / 6;
+                DrawFilledCircle(renderer, piece, PIECE_SIZE / 2);
+            }
+
+            SDL_SetRenderDrawColor(renderer, bluePlayerC.r, bluePlayerC.g, bluePlayerC.b, 255);
+
+            if (b->board.blue.test(i)) {
+                piece.x = i % 7;
+                piece.y = i / 6;
+                DrawFilledCircle(renderer, piece, PIECE_SIZE / 2);
+            }
+        }
+
+
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
-        for (size_t i = 0; i < 7; i++)
-        {
-            for (size_t j = 0; j < 6; j++)
-            {
-                SDL_Point p = { i * SQUARE_SIZE + SQUARE_SIZE / 2, (6 - j) * SQUARE_SIZE + SQUARE_SIZE / 2 };
-                DrawFilledCircle(renderer, p, PIECE_SIZE / 2);
-            }
-        }
-        SDL_Point p = { mousePos.x + 45, mousePos.y };
+        DrawBackground(SDL_Color{ 100, 100, 100, 255 }, 7, 6);
 
-        DrawCircle(renderer,p, PIECE_SIZE / 2);
-        p.x = mousePos.x - 45;
-        DrawCircle(renderer, p, PIECE_SIZE / 2);
+        SDL_SetRenderDrawColor(renderer, bluePlayerC.r, bluePlayerC.g, bluePlayerC.b, 255);
+
+        piece = { static_cast<int>(mousePos.x / SQUARE_SIZE) * SQUARE_SIZE + SQUARE_SIZE / 2, SQUARE_SIZE / 2 };
+        DrawFilledCircle(renderer, piece, PIECE_SIZE / 2);
+
+        SDL_SetRenderDrawColor(renderer, redPlayerC.r, redPlayerC.g, redPlayerC.b, 255);
 
         // Rendering
         SDL_RenderPresent(renderer);
