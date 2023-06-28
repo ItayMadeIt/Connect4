@@ -10,24 +10,44 @@ vector<Move> Board::GetMoves(State<7, 6>& simBoard)
 	Move move = Move();
 
 	move.c = simBoard.isRedTurn ? Red : Blue;
-	for (size_t i = 1; i <= 8; i++)
+	for (size_t i = 0; i < 7; i++)
 	{
-		if (!simBoard.board.test(i * 7)) {
+
+		int height = (Helper::FileMasks()[i] & simBoard.board).count();
+		if (height < 6) {
 			move.x = i;
+			move._RecievedHeight = height;
 			moves.push_back(move);
 		}
 	}
+	return moves;
 }
 
 void Board::MakeMove(State<7, 6>& simBoard, Move move) {
-	int pos = move.x * 7;
-	simBoard.board.set(pos);
+	int xPos = move.x;
+	int height = move._RecievedHeight;
 
-	if (move.c) {
-		simBoard.red.set(pos);
+	int finalPos = height * 7 + xPos;
+
+	simBoard.board.set(finalPos);
+
+	if (move.c == Red) {
+		simBoard.red.set(finalPos);
+		simBoard.isRedTurn = false;
 	}
 	else {
-		simBoard.blue.set(pos);
+		simBoard.blue.set(finalPos);
+		simBoard.isRedTurn = true;
 	}
 
+}
+
+Color Board::WhoWins(State<7, 6>& simBoard)
+{
+	Color winner = None;
+	if (simBoard.board.count() <= 7)
+		return winner;
+
+
+	
 }

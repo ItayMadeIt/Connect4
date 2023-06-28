@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include "Board.h"
+#include "Helper.h"
 
 using namespace std;
 
@@ -17,17 +18,22 @@ static int HEIGHT = (GRID_HEIGHT + 1) * SQUARE_SIZE;
 static SDL_Color redPlayerC = { 255, 0, 0, 255 };
 static SDL_Color bluePlayerC = { 0, 0, 255, 255 };
 
+SDL_Texture* RedWonText;
+SDL_Texture* BlueWonText;
+SDL_Rect textRect = {WIDTH/2 - WIDTH/5/2,HEIGHT/2 - HEIGHT/5/2,WIDTH/5,HEIGHT/5};
+
 SDL_Window* window;
 SDL_Renderer* renderer;
 
 SDL_Event event;
 
 SDL_Point mousePos;
+
+
 static int roundUpToMultipleOfEight(int v)
 {
     return (v + (8 - 1)) & -8;
 }
-
 static void DrawCircle(SDL_Renderer* renderer, SDL_Point center, int radius)
 {
     // 35 / 49 is a slightly biased approximation of 1/sqrt(2)
@@ -101,7 +107,6 @@ static void DrawFilledCircle(SDL_Renderer* renderer, SDL_Point center, int radiu
 
     delete[] points;
 }
-
 static void DrawBackground(SDL_Color bgColor, int width, int height) {
 
     SDL_SetRenderDrawColor(renderer, bgColor.r, bgColor.g, bgColor.b, 255);
@@ -116,6 +121,7 @@ static void DrawBackground(SDL_Color bgColor, int width, int height) {
     }
 
 }
+
 int main(int argc, char* argv[]) {
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -146,15 +152,31 @@ int main(int argc, char* argv[]) {
     }
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
+    SDL_Surface* redWonSurface = IMG_Load("Assets/Red Won Text.png");
+    if (redWonSurface) {
+        RedWonText = SDL_CreateTextureFromSurface(renderer, redWonSurface);
+        SDL_FreeSurface(redWonSurface);
+    }
+    
+    SDL_Surface* blueWonSurface = IMG_Load("Assets/Blue Won Text.png");
+    if (blueWonSurface) {
+        BlueWonText = SDL_CreateTextureFromSurface(renderer, blueWonSurface);
+        SDL_FreeSurface(blueWonSurface);
+    }
+
+
     bool running = true;
 
     SDL_Rect backgroundRect = { 0, SQUARE_SIZE, WIDTH, HEIGHT - SQUARE_SIZE};
 
     Board* b = new Board();
 
+
     while (running) {
         // Input
         SDL_GetMouseState(&mousePos.x, &mousePos.y);
+
+        vector<Move> moves = b->GetMoves(b->board);
 
         while (SDL_PollEvent(&event)) {
 
@@ -166,33 +188,18 @@ int main(int argc, char* argv[]) {
                 running = false;
             }
             if (event.button.button == SDL_BUTTON_LEFT && event.type == SDL_MOUSEBUTTONDOWN) {
-                Move m;
-                m.c = Red;
-                m.x = static_cast<int>(mousePos.x / SQUARE_SIZE) + 1;
-                b->MakeMove(b->board, m);
-            }
-
-        }
-        SDL_Point piece = { static_cast<int>(mousePos.x / SQUARE_SIZE) * SQUARE_SIZE + SQUARE_SIZE / 2, SQUARE_SIZE / 2 };
-
-        for (size_t i = 0; i < 7 * 6; i++)
-        {
-            SDL_SetRenderDrawColor(renderer, redPlayerC.r, redPlayerC.g, redPlayerC.b, 255);
-
-            if (b->board.red.test(i)) {
-                piece.x = i % 7;
-                piece.y = i / 6;
-                DrawFilledCircle(renderer, piece, PIECE_SIZE / 2);
-            }
-
-            SDL_SetRenderDrawColor(renderer, bluePlayerC.r, bluePlayerC.g, bluePlayerC.b, 255);
-
-            if (b->board.blue.test(i)) {
-                piece.x = i % 7;
-                piece.y = i / 6;
-                DrawFilledCircle(renderer, piece, PIECE_SIZE / 2);
+                
+                for (size_t i = 0; i < moves.size(); i++)
+                {
+                    if (moves[i].x == static_cast<int>(mousePos.x / SQUARE_SIZE)) {
+                        b->MakeMove(b->board, moves[i]);
+                    }
+                }
             }
         }
+
+        SDL_Point piece = { 0, 0};
+
 
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -200,12 +207,58 @@ int main(int argc, char* argv[]) {
 
         DrawBackground(SDL_Color{ 100, 100, 100, 255 }, 7, 6);
 
+
+        SDL_SetRenderDrawColor(renderer, redPlayerC.r, redPlayerC.g, redPlayerC.b, 255);
+
+        for (int rank = 0; rank < 6; ++rank) {
+            for (int file = 0; file < 7; ++file) {
+
+                int bitPosition = rank * 7 + file;
+                if (!b->board.red.test(bitPosition))
+                    continue;
+
+                piece.x = file * SQUARE_SIZE + SQUARE_SIZE / 2;
+                piece.y = (5 - rank) * SQUARE_SIZE + SQUARE_SIZE / 2 + SQUARE_SIZE;
+
+                DrawFilledCircle(renderer, piece, PIECE_SIZE / 2);
+            }
+        }
+        
         SDL_SetRenderDrawColor(renderer, bluePlayerC.r, bluePlayerC.g, bluePlayerC.b, 255);
+
+        for (int rank = 0; rank <= 5; ++rank) {
+            for (int file = 0; file <= 6; ++file) {
+
+                int bitPosition = rank * 7 + file;
+                if (!b->board.blue.test(bitPosition))
+                    continue;
+
+                piece.x = file * SQUARE_SIZE + SQUARE_SIZE / 2;
+                piece.y = (5 - rank) * SQUARE_SIZE + SQUARE_SIZE / 2 + SQUARE_SIZE;
+
+                DrawFilledCircle(renderer, piece, PIECE_SIZE / 2);
+                
+            }
+        }
+        /*
+        if (redwon) {
+            SDL_RenderCopy(renderer, RedWonText, nullptr, &textRect);
+        }
+        if (bluewon) {
+            SDL_RenderCopy(renderer, BlueWonText, nullptr, &textRect);
+        }        
+        */
+        if (b->board.isRedTurn) {
+            SDL_SetRenderDrawColor(renderer, redPlayerC.r, redPlayerC.g, redPlayerC.b, 255);
+        }
+        else {
+            SDL_SetRenderDrawColor(renderer, bluePlayerC.r, bluePlayerC.g, bluePlayerC.b, 255);
+        }
+
 
         piece = { static_cast<int>(mousePos.x / SQUARE_SIZE) * SQUARE_SIZE + SQUARE_SIZE / 2, SQUARE_SIZE / 2 };
         DrawFilledCircle(renderer, piece, PIECE_SIZE / 2);
 
-        SDL_SetRenderDrawColor(renderer, redPlayerC.r, redPlayerC.g, redPlayerC.b, 255);
 
         // Rendering
         SDL_RenderPresent(renderer);

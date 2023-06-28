@@ -17,6 +17,8 @@ public:
     vector<Move> GetMoves(State<7, 6>& simBoard);
 
     void MakeMove(State<7, 6>& simBoard, Move move);
+
+    Color WhoWins(State<7, 6>& simBoard);
 };
 
 
