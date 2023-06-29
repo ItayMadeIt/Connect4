@@ -44,10 +44,85 @@ void Board::MakeMove(State<7, 6>& simBoard, Move move) {
 
 Color Board::WhoWins(State<7, 6>& simBoard)
 {
-	Color winner = None;
-	if (simBoard.board.count() <= 7)
-		return winner;
+	if (simBoard.board.count() <= 6) // 3 for each side cannot have a winner
+		return None;
 
 
+	for (bitset<42> winningCheck : Helper::VerticalWins())
+	{
+		// Check if there are disks at the winning check
+		// if not continue to the next one
+		if ((simBoard.board & winningCheck).count() != 4)
+			continue;
+		
+		// Blue won
+		if ((winningCheck & simBoard.blue).count() == 4) {
+			return Blue;
+		}
+		// Red won
+		if ((winningCheck & simBoard.red).count() == 4) {
+			return Red;
+		}
+	}
+
+	for (bitset<42> winningCheck : Helper::HorizontalWins())
+	{
+		// Check if there are disks at the winning check
+		// if not continue to the next one
+		if ((simBoard.board & winningCheck).count() != 4)
+			continue;
+
+
+		// Blue won
+		if ((winningCheck & simBoard.blue).count() == 4) {
+			return Blue;
+		}
+		// Red won
+		if ((winningCheck & simBoard.red).count() == 4) {
+			return Red;
+		}
+	}
+
+	for (bitset<42> winningCheck : Helper::UprightWins())
+	{
+		// Check if there are disks at the winning check
+		// if not continue to the next one
+		if ((simBoard.board & winningCheck).count() != 4)
+			continue;
+
+
+		// Blue won
+		if ((winningCheck & simBoard.blue).count() == 4) {
+			return Blue;
+		}
+		// Red won
+		if ((winningCheck & simBoard.red).count() == 4) {
+			return Red;
+		}
+	}
+
+	for (bitset<42> winningCheck : Helper::DownrightWins())
+	{
+		// Check if there are disks at the winning check
+		// if not continue to the next one
+		if ((simBoard.board & winningCheck).count() != 4)
+			continue;
+
+
+		// Blue won
+		if ((winningCheck & simBoard.blue).count() == 4) {
+			cout << "blue board:" << endl;
+			Helper::PrintBoard(simBoard.blue);
+			cout << "check:" << endl;
+			Helper::PrintBoard(winningCheck);
+			return Blue;
+		}
+		// Red won
+		if ((winningCheck & simBoard.red).count() == 4) {
+			return Red;
+		}
+	}
+
+	return None;
 	
 }

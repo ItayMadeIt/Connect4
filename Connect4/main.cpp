@@ -240,14 +240,16 @@ int main(int argc, char* argv[]) {
                 
             }
         }
-        /*
-        if (redwon) {
+        
+
+        cout << "winner:" << static_cast<string>(b->WhoWins(b->board)) << endl;
+        if (b->WhoWins(b->board) == Red) {
             SDL_RenderCopy(renderer, RedWonText, nullptr, &textRect);
         }
-        if (bluewon) {
+        if (b->WhoWins(b->board) == Blue) {
             SDL_RenderCopy(renderer, BlueWonText, nullptr, &textRect);
         }        
-        */
+        
         if (b->board.isRedTurn) {
             SDL_SetRenderDrawColor(renderer, redPlayerC.r, redPlayerC.g, redPlayerC.b, 255);
         }

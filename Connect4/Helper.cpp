@@ -13,6 +13,7 @@ void Helper::PrintBoard(bitset<42> b)
 	}
 	cout << std::endl;
 }
+
 vector<bitset<42>> Helper::fileMasks = {};
 vector<bitset<42>> Helper::FileMasks()
 {
@@ -28,6 +29,8 @@ vector<bitset<42>> Helper::FileMasks()
 
 	return fileMasks;
 }
+
+
 vector<bitset<42>> Helper::horizontalWins = {};
 vector<bitset<42>> Helper::HorizontalWins()
 {
