@@ -1,5 +1,6 @@
 #include "Helper.h"
 
+
 void Helper::PrintBoard(bitset<42> b)
 {
 	for (int rank = 5; rank >= 0; --rank) {

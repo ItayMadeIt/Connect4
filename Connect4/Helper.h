@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <bitset>
+#include "Color.h"
 
 using namespace std;
 template<int Width, int Height>
@@ -26,11 +27,7 @@ struct State {
     }
     State() : State(true) {}
 };
-enum Color {
-    None = -1,
-    Red = 0,
-    Blue = 1
-};
+
 
 struct Move {
     int x;

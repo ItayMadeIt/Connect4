@@ -242,7 +242,7 @@ int main(int argc, char* argv[]) {
         }
         
 
-        cout << "winner:" << static_cast<string>(b->WhoWins(b->board)) << endl;
+        cout << "winner:" << b->WhoWins(b->board) << endl;
         if (b->WhoWins(b->board) == Red) {
             SDL_RenderCopy(renderer, RedWonText, nullptr, &textRect);
         }
