@@ -11,14 +11,11 @@ using namespace std;
 class Board {
 public:
 
-    Board();
-    State<7, 6> board;
+    static vector<Move> GetMoves(State<7, 6>& simBoard);
 
-    vector<Move> GetMoves(State<7, 6>& simBoard);
+    static void MakeMove(State<7, 6>& simBoard, Move move);
 
-    void MakeMove(State<7, 6>& simBoard, Move move);
-
-    Color WhoWins(State<7, 6>& simBoard);
+    static Color WhoWins(State<7, 6>& simBoard);
 };
 
 

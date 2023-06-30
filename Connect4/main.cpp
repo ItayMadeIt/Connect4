@@ -29,6 +29,9 @@ SDL_Event event;
 
 SDL_Point mousePos;
 
+State<7, 6> mainBoard;
+
+
 
 static int roundUpToMultipleOfEight(int v)
 {
@@ -176,7 +179,7 @@ int main(int argc, char* argv[]) {
         // Input
         SDL_GetMouseState(&mousePos.x, &mousePos.y);
 
-        vector<Move> moves = b->GetMoves(b->board);
+        vector<Move> moves = Board::GetMoves(mainBoard);
 
         while (SDL_PollEvent(&event)) {
 
@@ -192,7 +195,7 @@ int main(int argc, char* argv[]) {
                 for (size_t i = 0; i < moves.size(); i++)
                 {
                     if (moves[i].x == static_cast<int>(mousePos.x / SQUARE_SIZE)) {
-                        b->MakeMove(b->board, moves[i]);
+                        Board::MakeMove(mainBoard, moves[i]);
                     }
                 }
             }
@@ -214,7 +217,7 @@ int main(int argc, char* argv[]) {
             for (int file = 0; file < 7; ++file) {
 
                 int bitPosition = rank * 7 + file;
-                if (!b->board.red.test(bitPosition))
+                if (!mainBoard.red.test(bitPosition))
                     continue;
 
                 piece.x = file * SQUARE_SIZE + SQUARE_SIZE / 2;
@@ -230,7 +233,7 @@ int main(int argc, char* argv[]) {
             for (int file = 0; file <= 6; ++file) {
 
                 int bitPosition = rank * 7 + file;
-                if (!b->board.blue.test(bitPosition))
+                if (!mainBoard.blue.test(bitPosition))
                     continue;
 
                 piece.x = file * SQUARE_SIZE + SQUARE_SIZE / 2;
@@ -242,14 +245,14 @@ int main(int argc, char* argv[]) {
         }
         
 
-        if (b->WhoWins(b->board) == Red) {
+        if (Board::WhoWins(mainBoard) == Red) {
             SDL_RenderCopy(renderer, RedWonText, nullptr, &textRect);
         }
-        if (b->WhoWins(b->board) == Blue) {
+        if (Board::WhoWins(mainBoard) == Blue) {
             SDL_RenderCopy(renderer, BlueWonText, nullptr, &textRect);
         }        
         
-        if (b->board.isRedTurn) {
+        if (mainBoard.isRedTurn) {
             SDL_SetRenderDrawColor(renderer, redPlayerC.r, redPlayerC.g, redPlayerC.b, 255);
         }
         else {

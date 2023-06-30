@@ -2,6 +2,7 @@
 
 Move AI::CalculateBestMove(State<7, 6> board)
 {
+    Board::MakeMove();
     return Move();
 }
 
