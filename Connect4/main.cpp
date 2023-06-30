@@ -242,7 +242,6 @@ int main(int argc, char* argv[]) {
         }
         
 
-        cout << "winner:" << b->WhoWins(b->board) << endl;
         if (b->WhoWins(b->board) == Red) {
             SDL_RenderCopy(renderer, RedWonText, nullptr, &textRect);
         }
