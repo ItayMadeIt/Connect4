@@ -196,9 +196,9 @@ int main(int argc, char* argv[]) {
                 {
                     if (moves[i].x == static_cast<int>(mousePos.x / SQUARE_SIZE)) {
                         Board::MakeMove(mainBoard, moves[i]);
-                        MinimaxResult result = AI::CalculateBestMove(mainBoard, 5);
-                        cout << result.move.x << endl;
-                        Board::MakeMove(mainBoard, result.move);
+                        Move result = AI::CalculateBestMove(mainBoard, 15);
+                        cout << result.x << endl;
+                        Board::MakeMove(mainBoard, result);
                     }
                 }
             }

@@ -11,7 +11,7 @@ struct MinimaxResult {
 class AI
 {
 public:
-	static MinimaxResult CalculateBestMove(State<7, 6> board, int depth);
+	static Move CalculateBestMove(State<7, 6>& board, int depth);
+	static int Minimax(State<7, 6>& board, int depth, bool isMaximizingPlayer, int alpha, int beta);
 };
-
-#endif AI_HEADER
+#endif AI_HEADER 

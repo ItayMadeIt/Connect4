@@ -15,6 +15,26 @@ void Helper::PrintBoard(bitset<42> b)
 	cout << std::endl;
 }
 
+void Helper::PrintBoard(State<7, 6> state)
+{
+	for (int rank = 5; rank >= 0; --rank) {
+		for (int file = 0; file < 7; ++file) {
+			int bitPosition = rank * 7 + file;
+			if (state.board.test(bitPosition)){
+				if (state.blue.test(bitPosition))
+					cout << "B ";
+				if (state.red.test(bitPosition))
+					cout << "R ";
+			}
+			else {
+				cout << "U ";
+			}
+		}
+		cout << std::endl;
+	}
+	cout << std::endl;
+}
+
 vector<bitset<42>> Helper::fileMasks = {};
 vector<bitset<42>> Helper::FileMasks()
 {

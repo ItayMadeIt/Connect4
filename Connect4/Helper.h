@@ -41,6 +41,7 @@ class Helper
 {
 public:
     static void PrintBoard(bitset<42> b);
+    static void PrintBoard(State<7, 6> state);
 
     static vector<bitset<42>> FileMasks();
     static vector<bitset<42>> fileMasks;
