@@ -1,9 +1,5 @@
 #include "Board.h"
 
-Board::Board() {
-	board = State<7, 6>(true);
-}
-
 vector<Move> Board::GetMoves(State<7, 6>& simBoard)
 {
 	vector<Move> moves = vector<Move>();
@@ -111,10 +107,6 @@ Color Board::WhoWins(State<7, 6>& simBoard)
 
 		// Blue won
 		if ((winningCheck & simBoard.blue).count() == 4) {
-			cout << "blue board:" << endl;
-			Helper::PrintBoard(simBoard.blue);
-			cout << "check:" << endl;
-			Helper::PrintBoard(winningCheck);
 			return Blue;
 		}
 		// Red won

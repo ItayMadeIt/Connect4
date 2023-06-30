@@ -3,12 +3,15 @@
 
 #include "Board.h"
 
+struct MinimaxResult {
+	int bestEval;
+	Move move;
+};
+
 class AI
 {
 public:
-	Move CalculateBestMove(State<7, 6> board);
-private:
-	Move Minimax(State<7, 6> simBoard);
+	static MinimaxResult CalculateBestMove(State<7, 6> board, int depth);
 };
 
 #endif AI_HEADER

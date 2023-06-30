@@ -3,7 +3,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include "Board.h"
-#include "Helper.h"
+#include "AI.h"
 
 using namespace std;
 
@@ -196,6 +196,9 @@ int main(int argc, char* argv[]) {
                 {
                     if (moves[i].x == static_cast<int>(mousePos.x / SQUARE_SIZE)) {
                         Board::MakeMove(mainBoard, moves[i]);
+                        MinimaxResult result = AI::CalculateBestMove(mainBoard, 5);
+                        cout << result.move.x << endl;
+                        Board::MakeMove(mainBoard, result.move);
                     }
                 }
             }

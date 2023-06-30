@@ -6,9 +6,9 @@
 #include <iostream>
 
 enum Color {
-    None = -1,
-    Red = 0,
-    Blue = 1
+    Blue = -1,
+    None =  0,
+    Red  =  1
 };
 std::ostream& operator<<(std::ostream& os, const Color& value);
 
