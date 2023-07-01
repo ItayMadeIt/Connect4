@@ -1,59 +1,67 @@
 #include "AI.h"
 
 int AI::Minimax(State<7, 6>& board, int depth, bool isMaximizingPlayer, int alpha, int beta) {
-    if (depth == 0 || Board::WhoWins(board) != None) {
-        // Base case: return evaluation score
-        //Helper::PrintBoard(board);
-        return static_cast<int>(Board::WhoWins(board));
+    Color winState = Board::WhoWins(board);
+    
+    if (depth == 0 || winState != None) {
+        return winState; 
     }
 
     if (isMaximizingPlayer) {
-        int bestValue = INT_MIN;
-        vector<Move> moves = Board::GetMoves(board);
+        int bestValue = std::numeric_limits<int>::min();
+        std::vector<Move> moves = Board::GetMoves(board);
 
         for (const auto& move : moves) {
             State<7, 6> newBoard = board;
             Board::MakeMove(newBoard, move);
             int value = Minimax(newBoard, depth - 1, false, alpha, beta);
-            bestValue = max(bestValue, value);
-            alpha = max(alpha, bestValue);
-            if (beta <= alpha) {
-                break;  // Alpha-beta pruning
-            }
+            bestValue = std::max(bestValue, value);
         }
         return bestValue;
     }
     else {
-        int bestValue = INT_MAX;
-        vector<Move> moves = Board::GetMoves(board);
+        int bestValue = std::numeric_limits<int>::max();
+        std::vector<Move> moves = Board::GetMoves(board);
 
         for (const auto& move : moves) {
             State<7, 6> newBoard = board;
             Board::MakeMove(newBoard, move);
             int value = Minimax(newBoard, depth - 1, true, alpha, beta);
-            bestValue = min(bestValue, value);
-            beta = min(beta, bestValue);
-            if (beta <= alpha) {
-                break;  // Alpha-beta pruning
-            }
+            bestValue = std::min(bestValue, value);
         }
         return bestValue;
     }
-}
-
-Move AI::CalculateBestMove(State<7, 6>& board, int depth) {
-    vector<Move> moves = Board::GetMoves(board);
-    int bestValue = INT_MIN;
+}Move AI::CalculateBestMove(State<7, 6>& board, int depth) {
+    std::vector<Move> moves = Board::GetMoves(board);
+    int bestValue = 0;
+    if (board.isRedTurn)
+        bestValue = std::numeric_limits<int>::min();
+    if (!board.isRedTurn)
+        bestValue = std::numeric_limits<int>::max();
     Move bestMove = {};
 
     for (const auto& move : moves) {
         State<7, 6> newBoard = board;
         Board::MakeMove(newBoard, move);
-        int value = Minimax(newBoard, depth, board.isRedTurn, INT_MIN, INT_MAX);
 
-        if (value > bestValue) {
-            bestValue = value;
-            bestMove = move;
+        // Check if the move results in an immediate win for the opponent
+        if (Board::WhoWins(newBoard) != Color::None) {
+            continue;
+        }
+
+        int value = Minimax(newBoard, depth, !board.isRedTurn, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+
+        if (board.isRedTurn) {
+            if (value > bestValue) {
+                bestValue = value;
+                bestMove = move;
+            }
+        }
+        else {
+            if (value < bestValue) {
+                bestValue = value;
+                bestMove = move;
+            }
         }
     }
 

@@ -172,9 +172,19 @@ int main(int argc, char* argv[]) {
 
     SDL_Rect backgroundRect = { 0, SQUARE_SIZE, WIDTH, HEIGHT - SQUARE_SIZE};
 
-    Board* b = new Board();
-
-
+    vector<Move> moves = Board::GetMoves(mainBoard);
+    //Board::MakeMove(mainBoard,moves[3]);
+    //moves = Board::GetMoves(mainBoard);
+    //Board::MakeMove(mainBoard,moves[0]);
+    //moves = Board::GetMoves(mainBoard);
+    //Board::MakeMove(mainBoard, moves[3]);
+    //moves = Board::GetMoves(mainBoard);
+    //Board::MakeMove(mainBoard,moves[0]);
+    //moves = Board::GetMoves(mainBoard);
+    //Board::MakeMove(mainBoard,moves[3]);
+    //moves = Board::GetMoves(mainBoard);
+    //Board::MakeMove(mainBoard,moves[3]);
+    
     while (running) {
         // Input
         SDL_GetMouseState(&mousePos.x, &mousePos.y);
@@ -196,9 +206,10 @@ int main(int argc, char* argv[]) {
                 {
                     if (moves[i].x == static_cast<int>(mousePos.x / SQUARE_SIZE)) {
                         Board::MakeMove(mainBoard, moves[i]);
-                        Move result = AI::CalculateBestMove(mainBoard, 15);
-                        cout << result.x << endl;
-                        Board::MakeMove(mainBoard, result);
+                        if (Board::WhoWins(mainBoard) == None) {
+                            Move result = AI::CalculateBestMove(mainBoard, 3);
+                            Board::MakeMove(mainBoard, result);
+                        }
                     }
                 }
             }
