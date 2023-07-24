@@ -6,13 +6,12 @@ vector<Move> Board::GetMoves(State<7, 6>& simBoard)
 	Move move = Move();
 
 	move.c = simBoard.isRedTurn ? Red : Blue;
+
 	for (size_t i = 0; i < 7; i++)
 	{
-
-		int height = (Helper::FileMasks()[i] & simBoard.board).count();
-		if (height < 6) {
-			move.x = i;
-			move._RecievedHeight = height;
+		int column = positionOrder()[i];
+		if (!simBoard.board.test(column + 35)) {
+			move.x = column;
 			moves.push_back(move);
 		}
 	}
@@ -21,11 +20,14 @@ vector<Move> Board::GetMoves(State<7, 6>& simBoard)
 
 void Board::MakeMove(State<7, 6>& simBoard, Move move) {
 	int xPos = move.x;
-	int height = move._RecievedHeight;
+	int height = (Helper::FileMasks()[xPos] & simBoard.board).count();
+
 
 	int finalPos = height * 7 + xPos;
 
 	simBoard.board.set(finalPos);
+
+	simBoard.moves++;
 
 	if (move.c == Red) {
 		simBoard.red.set(finalPos);
@@ -38,9 +40,30 @@ void Board::MakeMove(State<7, 6>& simBoard, Move move) {
 
 }
 
+void Board::SetPosition(State<7, 6>& board, string position)
+{
+	for (int i = 0; i < position.size(); i++) {
+		
+		vector<Move> moves = Board::GetMoves(board);
+		
+		int X = static_cast<int>(position[i]) - 49;
+
+		for (size_t l = 0; l < moves.size(); l++)
+		{
+
+			if (moves[l].x == X)
+			{
+				Board::MakeMove(board, moves[l]);
+				break;
+			}
+		}
+
+	}
+}
+
 Color Board::WhoWins(State<7, 6>& simBoard)
 {
-	if (simBoard.board.count() <= 6) // 3 for each side cannot have a winner
+	if (simBoard.moves <= 6) // 3 for each side cannot have a winner or if the number of moves is the number 
 		return None;
 
 

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <bitset>
+#include <string>
 #include "Color.h"
 
 using namespace std;
@@ -23,8 +24,10 @@ struct State {
         isRedTurn = isRedStarts;
         red = 0;
         blue = 0;
+        moves = 0;
         board = 0;
     }
+    int moves;
     State() : State(true) {}
 };
 

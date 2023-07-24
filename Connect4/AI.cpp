@@ -31,7 +31,8 @@ int AI::Minimax(State<7, 6>& board, int depth, bool isMaximizingPlayer, int alph
         }
         return bestValue;
     }
-}Move AI::CalculateBestMove(State<7, 6>& board, int depth) {
+}
+Move AI::CalculateBestMove(State<7, 6>& board, int depth) {
     std::vector<Move> moves = Board::GetMoves(board);
     int bestValue = 0;
     if (board.isRedTurn)
@@ -49,7 +50,7 @@ int AI::Minimax(State<7, 6>& board, int depth, bool isMaximizingPlayer, int alph
             continue;
         }
 
-        int value = Minimax(newBoard, depth, !board.isRedTurn, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+        int value = Minimax(newBoard, depth, false, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
 
         if (board.isRedTurn) {
             if (value > bestValue) {
@@ -66,4 +67,34 @@ int AI::Minimax(State<7, 6>& board, int depth, bool isMaximizingPlayer, int alph
     }
 
     return bestMove;
+}
+
+pair<int,int> AI::Negamax(State<7, 6>& board) {
+    if (board.moves == board.size)
+        return { 0,-1 };
+
+    vector<Move> moves = Board::GetMoves(board);
+    for (size_t i = 0; i < moves.size(); i++)
+    {
+        State<7, 6> simBoard = board;
+        Board::MakeMove(simBoard, moves[i]);
+        if ((Board::WhoWins(simBoard) == 1 && board.isRedTurn) || (Board::WhoWins(simBoard) == -1 && !board.isRedTurn)) {
+            return { (board.size + 1 - board.moves) / 2, moves[i].x };
+        }
+    }
+    int xMove = moves[0].x;
+    int bestScore = -board.size;
+
+    for (size_t i = 0; i < moves.size(); i++)
+    {
+        State<7, 6> simBoard = board;
+        Board::MakeMove(simBoard, moves[i]);
+        int score = -Negamax(simBoard).first;
+        if (score > bestScore) {
+            bestScore = score;
+            xMove = moves[i].x;
+        }
+    }
+
+    return { bestScore, xMove };
 }

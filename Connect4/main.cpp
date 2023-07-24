@@ -124,7 +124,15 @@ static void DrawBackground(SDL_Color bgColor, int width, int height) {
     }
 
 }
-
+pair<int,int> solve(State<7, 6>& P)
+{
+    if (P.isRedTurn) {
+        return AI::Negamax(P);
+    }
+    else {
+        return AI::Negamax(P);
+    }
+}
 int main(int argc, char* argv[]) {
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -172,23 +180,13 @@ int main(int argc, char* argv[]) {
 
     SDL_Rect backgroundRect = { 0, SQUARE_SIZE, WIDTH, HEIGHT - SQUARE_SIZE};
 
-    vector<Move> moves = Board::GetMoves(mainBoard);
-    //Board::MakeMove(mainBoard,moves[3]);
-    //moves = Board::GetMoves(mainBoard);
-    //Board::MakeMove(mainBoard,moves[0]);
-    //moves = Board::GetMoves(mainBoard);
-    //Board::MakeMove(mainBoard, moves[3]);
-    //moves = Board::GetMoves(mainBoard);
-    //Board::MakeMove(mainBoard,moves[0]);
-    //moves = Board::GetMoves(mainBoard);
-    //Board::MakeMove(mainBoard,moves[3]);
-    //moves = Board::GetMoves(mainBoard);
-    //Board::MakeMove(mainBoard,moves[3]);
-    
+    Board::SetPosition(mainBoard, "4142435153676765565445");
+    cout << "value of game:" << solve(mainBoard).second;
+
     while (running) {
         // Input
         SDL_GetMouseState(&mousePos.x, &mousePos.y);
-
+        
         vector<Move> moves = Board::GetMoves(mainBoard);
 
         while (SDL_PollEvent(&event)) {
@@ -206,10 +204,8 @@ int main(int argc, char* argv[]) {
                 {
                     if (moves[i].x == static_cast<int>(mousePos.x / SQUARE_SIZE)) {
                         Board::MakeMove(mainBoard, moves[i]);
-                        if (Board::WhoWins(mainBoard) == None) {
-                            Move result = AI::CalculateBestMove(mainBoard, 3);
-                            Board::MakeMove(mainBoard, result);
-                        }
+                        cout << "value of game:" << solve(mainBoard).second;
+
                     }
                 }
             }
