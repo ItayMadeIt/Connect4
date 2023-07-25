@@ -14,6 +14,6 @@ public:
 	static Move CalculateBestMove(State<7, 6>& board, int depth);
 	static int Minimax(State<7, 6>& board, int depth, bool isMaximizingPlayer, int alpha, int beta);
 	static pair<int, int> Negamax(State<7, 6>& board);
-	static pair<int, int> Negamax(State<7, 6>& board, int depth, int alpha, int beta);
+	static pair<float, int> Negamax(State<7, 6>& board, int depth, float alpha, float beta);
 };
 #endif AI_HEADER 

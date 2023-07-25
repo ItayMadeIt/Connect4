@@ -127,10 +127,10 @@ static void DrawBackground(SDL_Color bgColor, int width, int height) {
 int solve(State<7,6>& P, bool weak=false) {
     int alpha, beta;
     
-    alpha = -1200;// * P.isRedTurn ? 1 : -1;
-    beta = 1200;// * P.isRedTurn ? 1 : -1;
+    alpha = -1200;
+    beta = 1200;
     
-    pair<int, int> result = AI::Negamax(P, 6, alpha, beta);
+    pair<int, int> result = AI::Negamax(P, 7, alpha, beta);
     return result.second;
 }
 

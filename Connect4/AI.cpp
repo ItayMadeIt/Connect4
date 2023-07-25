@@ -100,30 +100,26 @@ pair<int, int> AI::Negamax(State<7, 6>& board) {
 
     return { max, xMove };
 }
-pair<int, int> AI::Negamax(State<7, 6>& board, int depth, int alpha, int beta) {
+pair<float, int> AI::Negamax(State<7, 6>& board, int depth, float alpha, float beta) {
     if (board.moves == board.size || Board::WhoWins(board) != 0 || depth==0)
         return { Board::WhoWins(board), -1 };
 
     vector<Move> moves = Board::GetMoves(board);
 
     if (board.isRedTurn) {
-        int maxEval = -1300;
+        float maxEval = -1300;
         int xMove = -1;
         for (size_t i = 0; i < moves.size(); i++)
         {
-           //if (depth != 6) {
-           //    cout << ": move started:" << 6 - depth << " index:" << i;
-           //}
-           //else
-           //    cout << "move started:" << 6 << " index:" << i << endl;
+            
 
             State<7, 6> simBoard = board;
             Board::MakeMove(simBoard, moves[i]);
 
-            int eval = Negamax(simBoard, depth - 1, -beta, -alpha).first; // Negate the evaluation for opponent
+            float eval = Negamax(simBoard, depth - 1, -beta, -alpha).first;
+            eval /= pow(2, depth);
             if (eval > maxEval) {
                 maxEval = eval;
-                //cout << "depth:" << depth << "maxEval:" << maxEval << " eval:" << eval << " move:" << moves[i].x << endl;
                 xMove = moves[i].x;
             }
             alpha = max(alpha, eval);
@@ -135,19 +131,19 @@ pair<int, int> AI::Negamax(State<7, 6>& board, int depth, int alpha, int beta) {
         return { maxEval, xMove };
     }
     else {
-        int minEval = 1300;
+        float minEval = 1300;
         int xMove = -1;
         for (size_t i = 0; i < moves.size(); i++)
         {
-           //cout << ": move started:" << 6 - depth << " index:" << i ;
 
             State<7, 6> simBoard = board;
             Board::MakeMove(simBoard, moves[i]);
 
-            int eval = Negamax(simBoard, depth - 1, -beta, -alpha).first; // Negate the evaluation for opponent
+            float eval = Negamax(simBoard, depth - 1, -beta, -alpha).first; // Negate the evaluation for opponent
+            eval /= pow(2, depth);
+
             if (eval < minEval) {
                 minEval = eval;
-                //cout << "depth:" << depth << "minEval:" << minEval << " eval:" << eval << " move:" << moves[i].x << endl;
                 xMove = moves[i].x;
             }
             beta = min(beta, eval);
