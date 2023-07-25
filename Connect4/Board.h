@@ -18,6 +18,8 @@ public:
     static void SetPosition(State<7, 6>& board, string position);
 
     static Color WhoWins(State<7, 6>& simBoard);
+
+    static bool CanWin(State<7, 6>& simBoard);
 };
 
 

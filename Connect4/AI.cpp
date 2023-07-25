@@ -70,6 +70,7 @@ Move AI::CalculateBestMove(State<7, 6>& board, int depth) {
 }
 
 pair<int,int> AI::Negamax(State<7, 6>& board) {
+pair<int, int> AI::Negamax(State<7, 6>& board) {
     if (board.moves == board.size)
         return { 0,-1 };
 
@@ -83,18 +84,79 @@ pair<int,int> AI::Negamax(State<7, 6>& board) {
         }
     }
     int xMove = moves[0].x;
-    int bestScore = -board.size;
+    int max = -(board.size - 1 - board.moves);
+
+
 
     for (size_t i = 0; i < moves.size(); i++)
     {
         State<7, 6> simBoard = board;
         Board::MakeMove(simBoard, moves[i]);
         int score = -Negamax(simBoard).first;
-        if (score > bestScore) {
-            bestScore = score;
+        if (score > max) {
+            max = score;
             xMove = moves[i].x;
         }
     }
 
-    return { bestScore, xMove };
+    return { max, xMove };
+}
+pair<int, int> AI::Negamax(State<7, 6>& board, int depth, int alpha, int beta) {
+    if (board.moves == board.size || Board::WhoWins(board) != 0 || depth==0)
+        return { Board::WhoWins(board), -1 };
+
+    vector<Move> moves = Board::GetMoves(board);
+
+    if (board.isRedTurn) {
+        int maxEval = -1300;
+        int xMove = -1;
+        for (size_t i = 0; i < moves.size(); i++)
+        {
+           //if (depth != 6) {
+           //    cout << ": move started:" << 6 - depth << " index:" << i;
+           //}
+           //else
+           //    cout << "move started:" << 6 << " index:" << i << endl;
+
+            State<7, 6> simBoard = board;
+            Board::MakeMove(simBoard, moves[i]);
+
+            int eval = Negamax(simBoard, depth - 1, -beta, -alpha).first; // Negate the evaluation for opponent
+            if (eval > maxEval) {
+                maxEval = eval;
+                //cout << "depth:" << depth << "maxEval:" << maxEval << " eval:" << eval << " move:" << moves[i].x << endl;
+                xMove = moves[i].x;
+            }
+            alpha = max(alpha, eval);
+
+            // Alpha-beta pruning
+            if (alpha >= beta)
+                break;
+        }
+        return { maxEval, xMove };
+    }
+    else {
+        int minEval = 1300;
+        int xMove = -1;
+        for (size_t i = 0; i < moves.size(); i++)
+        {
+           //cout << ": move started:" << 6 - depth << " index:" << i ;
+
+            State<7, 6> simBoard = board;
+            Board::MakeMove(simBoard, moves[i]);
+
+            int eval = Negamax(simBoard, depth - 1, -beta, -alpha).first; // Negate the evaluation for opponent
+            if (eval < minEval) {
+                minEval = eval;
+                //cout << "depth:" << depth << "minEval:" << minEval << " eval:" << eval << " move:" << moves[i].x << endl;
+                xMove = moves[i].x;
+            }
+            beta = min(beta, eval);
+
+            // Alpha-beta pruning
+            if (alpha >= beta)
+                break;
+        }
+        return { minEval, xMove }; // Return -1 as the move, as we are not returning the best move
+    }
 }

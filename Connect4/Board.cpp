@@ -141,3 +141,18 @@ Color Board::WhoWins(State<7, 6>& simBoard)
 	return None;
 	
 }
+
+bool Board::CanWin(State<7, 6>& board)
+{
+	vector<Move> moves = Board::GetMoves(board);
+	for (size_t i = 0; i < moves.size(); i++)
+	{
+		State<7, 6> simBoard = board;
+		Board::MakeMove(simBoard, moves[i]);
+		if ((Board::WhoWins(simBoard) == 1 && board.isRedTurn) || (Board::WhoWins(simBoard) == -1 && !board.isRedTurn)) {
+			return true;
+		}
+	}
+	return false;
+
+}

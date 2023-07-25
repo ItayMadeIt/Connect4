@@ -124,15 +124,16 @@ static void DrawBackground(SDL_Color bgColor, int width, int height) {
     }
 
 }
-pair<int,int> solve(State<7, 6>& P)
-{
-    if (P.isRedTurn) {
-        return AI::Negamax(P);
-    }
-    else {
-        return AI::Negamax(P);
-    }
+int solve(State<7,6>& P, bool weak=false) {
+    int alpha, beta;
+    
+    alpha = -1200;// * P.isRedTurn ? 1 : -1;
+    beta = 1200;// * P.isRedTurn ? 1 : -1;
+    
+    pair<int, int> result = AI::Negamax(P, 6, alpha, beta);
+    return result.second;
 }
+
 int main(int argc, char* argv[]) {
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -180,8 +181,8 @@ int main(int argc, char* argv[]) {
 
     SDL_Rect backgroundRect = { 0, SQUARE_SIZE, WIDTH, HEIGHT - SQUARE_SIZE};
 
-    Board::SetPosition(mainBoard, "4142435153676765565445");
-    cout << "value of game:" << solve(mainBoard).second;
+    Board::SetPosition(mainBoard, "7556766754744231");
+    cout << "value of game:" << solve(mainBoard);
 
     while (running) {
         // Input
@@ -204,7 +205,7 @@ int main(int argc, char* argv[]) {
                 {
                     if (moves[i].x == static_cast<int>(mousePos.x / SQUARE_SIZE)) {
                         Board::MakeMove(mainBoard, moves[i]);
-                        cout << "value of game:" << solve(mainBoard).second;
+                        cout << "value of game:" << solve(mainBoard);
 
                     }
                 }
