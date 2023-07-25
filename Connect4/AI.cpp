@@ -69,7 +69,6 @@ Move AI::CalculateBestMove(State<7, 6>& board, int depth) {
     return bestMove;
 }
 
-pair<int,int> AI::Negamax(State<7, 6>& board) {
 pair<int, int> AI::Negamax(State<7, 6>& board) {
     if (board.moves == board.size)
         return { 0,-1 };
