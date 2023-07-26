@@ -30,7 +30,7 @@ SDL_Event event;
 SDL_Point mousePos;
 
 State<7, 6> mainBoard;
-
+Position mainPosition;
 
 
 static int roundUpToMultipleOfEight(int v)
@@ -124,17 +124,40 @@ static void DrawBackground(SDL_Color bgColor, int width, int height) {
     }
 
 }
-int solve(State<7,6>& P, bool weak=false) {
+int solve(State<7, 6>& P, bool weak = false) {
     int alpha, beta;
-    
+
     alpha = -1200;
     beta = 1200;
-    
-    pair<int, int> result = AI::Negamax(P, 7, alpha, beta);
+
+    float timeStart = SDL_GetTicks();
+    // 12 is a template depth
+    pair<int, int> result = AI::Minimax(P, 15, alpha, beta);
+    float timeEnd = SDL_GetTicks();
+    cout << "time board:" << (timeEnd - timeStart) / 1000.0 << endl;
+
+    return result.second;
+}
+
+int solve(Position& P) {
+    int alpha, beta;
+
+    alpha = -1000;
+    beta = 1000;
+
+    float timeStart = SDL_GetTicks();
+
+    pair<int, int> result = AI::Minimax(P,15, alpha, beta);
+
+    float timeEnd = SDL_GetTicks();
+    cout << "time position:" << (timeEnd - timeStart) / 1000.0 << endl;
+
     return result.second;
 }
 
 int main(int argc, char* argv[]) {
+#pragma region initalizing_SDL
+
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -181,7 +204,11 @@ int main(int argc, char* argv[]) {
 
     SDL_Rect backgroundRect = { 0, SQUARE_SIZE, WIDTH, HEIGHT - SQUARE_SIZE};
 
-    Board::SetPosition(mainBoard, "7556766754744231");
+#pragma endregion
+
+    Board::SetPosition(mainBoard, "");
+    mainPosition.play("");
+    cout << "value of game:" << solve(mainPosition);
     cout << "value of game:" << solve(mainBoard);
 
     while (running) {

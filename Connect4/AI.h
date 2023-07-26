@@ -1,7 +1,9 @@
 #ifndef AI_HEADER
 #define AI_HEADER
+#include <cassert>
 
 #include "Board.h"
+#include "Position.hpp"
 
 struct MinimaxResult {
 	int bestEval;
@@ -11,9 +13,14 @@ struct MinimaxResult {
 class AI
 {
 public:
-	static Move CalculateBestMove(State<7, 6>& board, int depth);
-	static int Minimax(State<7, 6>& board, int depth, bool isMaximizingPlayer, int alpha, int beta);
-	static pair<int, int> Negamax(State<7, 6>& board);
-	static pair<float, int> Negamax(State<7, 6>& board, int depth, float alpha, float beta);
+	
+	
+	static int* ColumnOrder() {
+		return new int[Position::WIDTH] { 3,2,4,1,5,0,6 };	
+	}
+
+	int NodeCount;
+	static pair<int, int> Minimax(Position &board, int depth, float alpha, float beta);
+	static pair<float, int> Minimax(State<7, 6>& board, int depth, float alpha, float beta);
 };
 #endif AI_HEADER 
