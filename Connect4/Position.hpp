@@ -70,7 +70,7 @@ public:
     }
     uint64_t key() const
     {
-        return current_position + mask;
+        return current_position ^ mask;
     }
 
     Position() : current_position{ 0 }, mask{ 0 }, moves{ 0 } {}

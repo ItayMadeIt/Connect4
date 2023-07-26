@@ -132,27 +132,23 @@ int solve(State<7, 6>& P, bool weak = false) {
 
     float timeStart = SDL_GetTicks();
     // 12 is a template depth
-    pair<int, int> result = AI::Minimax(P, 15, alpha, beta);
+    pair<int, int> result = AI::Minimax(P, 12, alpha, beta);
     float timeEnd = SDL_GetTicks();
     cout << "time board:" << (timeEnd - timeStart) / 1000.0 << endl;
 
-    return result.second;
+    return result.first;
 }
 
 int solve(Position& P) {
-    int alpha, beta;
-
-    alpha = -1000;
-    beta = 1000;
-
+    
     float timeStart = SDL_GetTicks();
 
-    pair<int, int> result = AI::Minimax(P,15, alpha, beta);
+    pair<int, int> result = AI::Minimax(P, 12, -Position::WIDTH * Position::HEIGHT / 2, Position::WIDTH * Position::HEIGHT / 2);
 
     float timeEnd = SDL_GetTicks();
     cout << "time position:" << (timeEnd - timeStart) / 1000.0 << endl;
 
-    return result.second;
+    return result.first;
 }
 
 int main(int argc, char* argv[]) {
@@ -208,8 +204,8 @@ int main(int argc, char* argv[]) {
 
     Board::SetPosition(mainBoard, "");
     mainPosition.play("");
-    cout << "value of game:" << solve(mainPosition);
-    cout << "value of game:" << solve(mainBoard);
+    cout << "value of game:" << solve(mainPosition) << endl << endl;
+    cout << "value of game:" << solve(mainBoard) << endl << endl;
 
     while (running) {
         // Input
@@ -232,7 +228,8 @@ int main(int argc, char* argv[]) {
                 {
                     if (moves[i].x == static_cast<int>(mousePos.x / SQUARE_SIZE)) {
                         Board::MakeMove(mainBoard, moves[i]);
-                        cout << "value of game:" << solve(mainBoard);
+                        cout << "value of game:" << solve(mainPosition) << endl << endl;
+                        cout << "value of game:" << solve(mainBoard) << endl << endl;
 
                     }
                 }

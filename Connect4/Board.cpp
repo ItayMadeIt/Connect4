@@ -18,7 +18,7 @@ vector<Move> Board::GetMoves(State<7, 6>& simBoard)
 	return moves;
 }
 
-void Board::MakeMove(State<7, 6>& simBoard, Move move) {
+Color Board::MakeMove(State<7, 6>& simBoard, Move move) {
 	int xPos = move.x;
 	int height = (Helper::FileMasks()[xPos] & simBoard.board).count();
 
@@ -32,10 +32,12 @@ void Board::MakeMove(State<7, 6>& simBoard, Move move) {
 	if (move.c == Red) {
 		simBoard.red.set(finalPos);
 		simBoard.isRedTurn = false;
+		return (Board::Check4Alignment(simBoard.red)) ? Red : None;
 	}
 	else {
 		simBoard.blue.set(finalPos);
 		simBoard.isRedTurn = true;
+		return (Board::Check4Alignment(simBoard.blue)) ? Blue : None;
 	}
 
 }
@@ -61,86 +63,47 @@ void Board::SetPosition(State<7, 6>& board, string position)
 	}
 }
 
-Color Board::WhoWins(State<7, 6>& simBoard)
+Color Board::WhoWins(State<7, 6>& board)
 {
-	if (simBoard.moves <= 6) // 3 for each side cannot have a winner or if the number of moves is the number 
-		return None;
+	if (Check4Alignment(board.blue))
+		return Blue;
 
-
-	for (bitset<42> winningCheck : Helper::VerticalWins())
-	{
-		// Check if there are disks at the winning check
-		// if not continue to the next one
-		if ((simBoard.board & winningCheck).count() != 4)
-			continue;
-		
-		// Blue won
-		if ((winningCheck & simBoard.blue).count() == 4) {
-			return Blue;
-		}
-		// Red won
-		if ((winningCheck & simBoard.red).count() == 4) {
-			return Red;
-		}
-	}
-
-	for (bitset<42> winningCheck : Helper::HorizontalWins())
-	{
-		// Check if there are disks at the winning check
-		// if not continue to the next one
-		if ((simBoard.board & winningCheck).count() != 4)
-			continue;
-
-
-		// Blue won
-		if ((winningCheck & simBoard.blue).count() == 4) {
-			return Blue;
-		}
-		// Red won
-		if ((winningCheck & simBoard.red).count() == 4) {
-			return Red;
-		}
-	}
-
-	for (bitset<42> winningCheck : Helper::UprightWins())
-	{
-		// Check if there are disks at the winning check
-		// if not continue to the next one
-		if ((simBoard.board & winningCheck).count() != 4)
-			continue;
-
-
-		// Blue won
-		if ((winningCheck & simBoard.blue).count() == 4) {
-			return Blue;
-		}
-		// Red won
-		if ((winningCheck & simBoard.red).count() == 4) {
-			return Red;
-		}
-	}
-
-	for (bitset<42> winningCheck : Helper::DownrightWins())
-	{
-		// Check if there are disks at the winning check
-		// if not continue to the next one
-		if ((simBoard.board & winningCheck).count() != 4)
-			continue;
-
-
-		// Blue won
-		if ((winningCheck & simBoard.blue).count() == 4) {
-			return Blue;
-		}
-		// Red won
-		if ((winningCheck & simBoard.red).count() == 4) {
-			return Red;
-		}
-	}
+	if (Check4Alignment(board.red))
+		return Red;
 
 	return None;
 	
 }
+
+bool Board::Check4Alignment(bitset<42> board)
+{
+	// Horizontal
+	bitset<42> hor = board & (board >> 1);
+	if ((hor & (hor >> 2)) != 0)
+		return true;
+
+
+	// Vertical
+	bitset<42> ver = board & (board >> 7);
+	if ((ver & (ver >> 14)) != 0)
+		return true;
+
+
+	// Diagonal Right-Up
+	bitset<42> digUp = board & (board >> 8);
+	if ((digUp & (digUp >> 16)) != 0)
+		return true;
+
+
+	// Diagonal Right-Down
+	bitset<42> digDown = board & (board >> 6);
+	if ((digDown & (digDown >> 12)) != 0)
+		return true;
+	
+
+	return false;
+}
+
 
 bool Board::CanWin(State<7, 6>& board)
 {
@@ -148,8 +111,7 @@ bool Board::CanWin(State<7, 6>& board)
 	for (size_t i = 0; i < moves.size(); i++)
 	{
 		State<7, 6> simBoard = board;
-		Board::MakeMove(simBoard, moves[i]);
-		if ((Board::WhoWins(simBoard) == 1 && board.isRedTurn) || (Board::WhoWins(simBoard) == -1 && !board.isRedTurn)) {
+		if (Board::MakeMove(simBoard, moves[i]) != 0){
 			return true;
 		}
 	}

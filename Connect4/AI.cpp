@@ -51,7 +51,7 @@ pair<float, int> AI::Minimax(State<7, 6>& board, int depth, float alpha, float b
     vector<Move> moves = Board::GetMoves(board);
 
     if (board.isRedTurn) {
-        float maxEval = -1300;
+        float maxEval = -1000;
         int xMove = -1;
         for (size_t i = 0; i < moves.size(); i++)
         {
@@ -75,7 +75,7 @@ pair<float, int> AI::Minimax(State<7, 6>& board, int depth, float alpha, float b
         return { maxEval, xMove };
     }
     else {
-        float minEval = 1300;
+        float minEval = 1000;
         int xMove = -1;
         for (size_t i = 0; i < moves.size(); i++)
         {
