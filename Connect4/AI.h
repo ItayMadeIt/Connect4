@@ -7,7 +7,7 @@
 
 struct MinimaxResult {
 	int bestEval;
-	Move move;
+	int move;
 };
 
 class AI
@@ -21,6 +21,6 @@ public:
 
 	int NodeCount;
 	static pair<int, int> Minimax(Position &board, int depth, float alpha, float beta);
-	static pair<float, int> Minimax(State<7, 6>& board, int depth, float alpha, float beta);
+	static pair<int, int> Minimax(State<7, 6> board, int depth, float alpha, float beta);
 };
 #endif AI_HEADER 

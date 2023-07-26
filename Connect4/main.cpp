@@ -211,7 +211,7 @@ int main(int argc, char* argv[]) {
         // Input
         SDL_GetMouseState(&mousePos.x, &mousePos.y);
         
-        vector<Move> moves = Board::GetMoves(mainBoard);
+        vector<int> moves = Board::GetMoves(mainBoard);
 
         while (SDL_PollEvent(&event)) {
 
@@ -226,7 +226,7 @@ int main(int argc, char* argv[]) {
                 
                 for (size_t i = 0; i < moves.size(); i++)
                 {
-                    if (moves[i].x == static_cast<int>(mousePos.x / SQUARE_SIZE)) {
+                    if (moves[i] == static_cast<int>(mousePos.x / SQUARE_SIZE)) {
                         Board::MakeMove(mainBoard, moves[i]);
                         cout << "value of game:" << solve(mainPosition) << endl << endl;
                         cout << "value of game:" << solve(mainBoard) << endl << endl;
@@ -248,11 +248,14 @@ int main(int argc, char* argv[]) {
 
         SDL_SetRenderDrawColor(renderer, redPlayerC.r, redPlayerC.g, redPlayerC.b, 255);
 
+        bitset<42> red  = ( mainBoard.isRedTurn ? mainBoard.position : mainBoard.mask ^ mainBoard.position);
+        bitset<42> blue = (!mainBoard.isRedTurn ? mainBoard.position : mainBoard.mask ^ mainBoard.position);
+
         for (int rank = 0; rank < 6; ++rank) {
             for (int file = 0; file < 7; ++file) {
 
                 int bitPosition = rank * 7 + file;
-                if (!mainBoard.red.test(bitPosition))
+                if (!red.test(bitPosition))
                     continue;
 
                 piece.x = file * SQUARE_SIZE + SQUARE_SIZE / 2;
@@ -268,7 +271,8 @@ int main(int argc, char* argv[]) {
             for (int file = 0; file <= 6; ++file) {
 
                 int bitPosition = rank * 7 + file;
-                if (!mainBoard.blue.test(bitPosition))
+
+                if (!blue.test(bitPosition))
                     continue;
 
                 piece.x = file * SQUARE_SIZE + SQUARE_SIZE / 2;

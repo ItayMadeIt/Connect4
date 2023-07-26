@@ -43,59 +43,32 @@ pair<int, int> AI::Minimax(Position& board, int depth, float alpha, float beta) 
 
 }
 
-pair<float, int> AI::Minimax(State<7, 6>& board, int depth, float alpha, float beta) {
-    int state = Board::WhoWins(board);
-    if (board.moves == board.size || state != 0 || depth == 0)
-        return { state, -1 };
-
-    vector<Move> moves = Board::GetMoves(board);
-
-    if (board.isRedTurn) {
-        float maxEval = -1000;
-        int xMove = -1;
-        for (size_t i = 0; i < moves.size(); i++)
-        {
-
-
-            State<7, 6> simBoard = board;
-            Board::MakeMove(simBoard, moves[i]);
-
-            float eval = Minimax(simBoard, depth - 1, alpha, beta).first;
-            eval /= pow(2, depth);
-            if (eval > maxEval) {
-                maxEval = eval;
-                xMove = moves[i].x;
-            }
-            alpha = max(alpha, eval);
-
-            // Alpha-beta pruning
-            if (alpha >= beta)
-                break;
-        }
-        return { maxEval, xMove };
+pair<int, int> AI::Minimax(State<7, 6> board, int depth, float alpha, float beta) {
+    assert(alpha < beta);
+    if (board.moves == board.size || depth == 0)
+        return {0, -1 };
+     
+    vector<int> moves = Board::GetMoves(board);
+    
+    int max = (board.size - 1 - board.moves) / 2;
+    int xMove = moves[0];
+    if (beta > max) {
+        beta = max;
+        if (alpha >= beta) return { beta, -1 };
     }
-    else {
-        float minEval = 1000;
-        int xMove = -1;
-        for (size_t i = 0; i < moves.size(); i++)
-        {
 
-            State<7, 6> simBoard = board;
-            Board::MakeMove(simBoard, moves[i]);
+    for (size_t i = 0; i < moves.size(); i++)
+    {
 
-            float eval = Minimax(simBoard, depth - 1, alpha, beta).first; // Negate the evaluation for opponent
-            eval /= depth;
-
-            if (eval < minEval) {
-                minEval = eval;
-                xMove = moves[i].x;
-            }
-            beta = min(beta, eval);
-
-            // Alpha-beta pruning
-            if (alpha >= beta)
-                break;
+        State<7, 6> simBoard = board;
+        if (Board::MakeMove(simBoard, moves[i]) != 0) {
+            return { (board.size + 1 - board.moves) / 2 , moves[i]};
         }
-        return { minEval, xMove }; // Return -1 as the move, as we are not returning the best move
+
+        float eval = -Minimax(simBoard, depth - 1, -beta, -alpha).first;
+
+        if (eval >= beta) return { eval, moves[i]};
+        if (eval > alpha) alpha = eval;
     }
+    return { alpha, xMove };
 }

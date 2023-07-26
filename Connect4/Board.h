@@ -11,9 +11,10 @@ class Board {
 public:
     static vector<int> positionOrder() { return { 3,2,4,5,1,6,0 }; };
 
-    static vector<Move> GetMoves(State<7, 6>& simBoard);
+    // Moves as X
+    static vector<int> GetMoves(State<7, 6>& simBoard);
 
-    static Color MakeMove(State<7, 6>& simBoard, Move move);
+    static Color MakeMove(State<7, 6>& simBoard, int move);
 
     static void SetPosition(State<7, 6>& board, string position);
 

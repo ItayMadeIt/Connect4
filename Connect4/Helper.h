@@ -16,30 +16,22 @@ struct StateHelper {
 template<int Width, int Height>
 struct State {
     static constexpr int size = StateHelper<Width, Height>::Size;
-    bitset<size> red;
-    bitset<size> blue;
-    bitset<size> board;
+
+    bitset<size> position; // just the current player's disks
+    bitset<size> mask; // all disks as ones 
+    
     bool isRedTurn;
+    
     State(bool isRedStarts) {
         isRedTurn = isRedStarts;
-        red = 0;
-        blue = 0;
         moves = 0;
-        board = 0;
+        mask = 0;
+        position = 0;
     }
     int moves;
     State() : State(true) {}
 };
 
-
-struct Move {
-    int x;
-    Color c;
-    /// <summary>
-    /// The height position of the piece
-    /// </summary>
-    int _RecievedHeight;
-};
 class Helper
 {
 public:

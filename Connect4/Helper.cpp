@@ -17,13 +17,17 @@ void Helper::PrintBoard(bitset<42> b)
 
 void Helper::PrintBoard(State<7, 6> state)
 {
+	bitset<42> board = state.mask;
+	bitset<42> red  =  state.isRedTurn ? state.position : state.position ^ state.mask;
+	bitset<42> blue = !state.isRedTurn ? state.position : state.position ^ state.mask;
+
 	for (int rank = 5; rank >= 0; --rank) {
 		for (int file = 0; file < 7; ++file) {
 			int bitPosition = rank * 7 + file;
-			if (state.board.test(bitPosition)){
-				if (state.blue.test(bitPosition))
+			if (board.test(bitPosition)){
+				if (blue.test(bitPosition))
 					cout << "B ";
-				if (state.red.test(bitPosition))
+				if (red.test(bitPosition))
 					cout << "R ";
 			}
 			else {

@@ -1,59 +1,49 @@
 #include "Board.h"
 
-vector<Move> Board::GetMoves(State<7, 6>& simBoard)
+vector<int> Board::GetMoves(State<7, 6>& simBoard)
 {
-	vector<Move> moves = vector<Move>();
-	Move move = Move();
-
-	move.c = simBoard.isRedTurn ? Red : Blue;
+	vector<int> moves = vector<int>();
 
 	for (size_t i = 0; i < 7; i++)
 	{
 		int column = positionOrder()[i];
-		if (!simBoard.board.test(column + 35)) {
-			move.x = column;
-			moves.push_back(move);
-		}
+
+		if (!simBoard.mask.test(column + 35)) 
+			moves.push_back(column);
 	}
 	return moves;
 }
 
-Color Board::MakeMove(State<7, 6>& simBoard, Move move) {
-	int xPos = move.x;
-	int height = (Helper::FileMasks()[xPos] & simBoard.board).count();
+Color Board::MakeMove(State<7, 6>& board, int move) {
 
+	// Changing the position to represent the opposing player 
+	board.position ^= board.mask;
 
-	int finalPos = height * 7 + xPos;
+	board.mask |= (board.mask & Helper::FileMasks()[move]) >> 7;
+	//board.mask |= board.mask.to_ulong() + (1ull << move);
+	
+	Color didWon = (Board::Check4Alignment(board.position)) ? (board.isRedTurn ? Red : Blue) : None;;
 
-	simBoard.board.set(finalPos);
+	board.isRedTurn = !board.isRedTurn;
+	
+	board.moves++;
 
-	simBoard.moves++;
-
-	if (move.c == Red) {
-		simBoard.red.set(finalPos);
-		simBoard.isRedTurn = false;
-		return (Board::Check4Alignment(simBoard.red)) ? Red : None;
-	}
-	else {
-		simBoard.blue.set(finalPos);
-		simBoard.isRedTurn = true;
-		return (Board::Check4Alignment(simBoard.blue)) ? Blue : None;
-	}
-
+	return didWon;
+	
 }
 
 void Board::SetPosition(State<7, 6>& board, string position)
 {
 	for (int i = 0; i < position.size(); i++) {
 		
-		vector<Move> moves = Board::GetMoves(board);
+		vector<int> moves = Board::GetMoves(board);
 		
 		int X = static_cast<int>(position[i]) - 49;
 
 		for (size_t l = 0; l < moves.size(); l++)
 		{
 
-			if (moves[l].x == X)
+			if (moves[l] == X)
 			{
 				Board::MakeMove(board, moves[l]);
 				break;
@@ -65,11 +55,8 @@ void Board::SetPosition(State<7, 6>& board, string position)
 
 Color Board::WhoWins(State<7, 6>& board)
 {
-	if (Check4Alignment(board.blue))
-		return Blue;
-
-	if (Check4Alignment(board.red))
-		return Red;
+	if (Check4Alignment(board.position))
+		return (board.isRedTurn ? Red : Blue);
 
 	return None;
 	
@@ -107,7 +94,7 @@ bool Board::Check4Alignment(bitset<42> board)
 
 bool Board::CanWin(State<7, 6>& board)
 {
-	vector<Move> moves = Board::GetMoves(board);
+	vector<int> moves = Board::GetMoves(board);
 	for (size_t i = 0; i < moves.size(); i++)
 	{
 		State<7, 6> simBoard = board;
