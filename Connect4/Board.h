@@ -20,7 +20,7 @@ public:
 
     static Color WhoWins(State<7, 6>& board);
 
-    static bool Check4Alignment(bitset<42> board);
+    static bool Check4Alignment(uint64_t board);
 
     static bool CanWin(State<7, 6>& simBoard);
 };

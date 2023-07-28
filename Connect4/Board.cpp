@@ -17,12 +17,14 @@ vector<int> Board::GetMoves(State<7, 6>& simBoard)
 Color Board::MakeMove(State<7, 6>& board, int move) {
 
 	// Changing the position to represent the opposing player 
-	board.position ^= board.mask;
+	int height = (Helper::FileMasks()[move] & board.mask).count();
 
-	board.mask |= (board.mask & Helper::FileMasks()[move]) >> 7;
-	//board.mask |= board.mask.to_ulong() + (1ull << move);
+	board.position ^= board.mask;
 	
-	Color didWon = (Board::Check4Alignment(board.position)) ? (board.isRedTurn ? Red : Blue) : None;;
+	board.mask.set(height * 7 + move);
+
+	Color didWon = (Board::Check4Alignment((board.mask ^ board.position).to_ullong())) ? (board.isRedTurn ? Red : Blue) : None;
+
 
 	board.isRedTurn = !board.isRedTurn;
 	
@@ -55,36 +57,36 @@ void Board::SetPosition(State<7, 6>& board, string position)
 
 Color Board::WhoWins(State<7, 6>& board)
 {
-	if (Check4Alignment(board.position))
-		return (board.isRedTurn ? Red : Blue);
-
+	if (Check4Alignment( (board.mask ^ board.position).to_ullong() ) ) {
+		return (!board.isRedTurn ? Red : Blue);
+	}
 	return None;
 	
 }
 
-bool Board::Check4Alignment(bitset<42> board)
+bool Board::Check4Alignment(uint64_t board)
 {
 	// Horizontal
-	bitset<42> hor = board & (board >> 1);
-	if ((hor & (hor >> 2)) != 0)
+	uint64_t hor = board & (board >> 1);
+	if ((hor & (hor >> 2)))
 		return true;
 
 
 	// Vertical
-	bitset<42> ver = board & (board >> 7);
-	if ((ver & (ver >> 14)) != 0)
+	uint64_t ver = board & (board >> 7);
+	if ((ver & (ver >> 14)))
 		return true;
 
 
 	// Diagonal Right-Up
-	bitset<42> digUp = board & (board >> 8);
-	if ((digUp & (digUp >> 16)) != 0)
+	uint64_t digUp = board & (board >> 8);
+	if ((digUp & (digUp >> 16)))
 		return true;
 
 
 	// Diagonal Right-Down
-	bitset<42> digDown = board & (board >> 6);
-	if ((digDown & (digDown >> 12)) != 0)
+	uint64_t digDown = board & (board >> 6);
+	if ((digDown & (digDown >> 12)))
 		return true;
 	
 

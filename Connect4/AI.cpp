@@ -51,7 +51,7 @@ pair<int, int> AI::Minimax(State<7, 6> board, int depth, float alpha, float beta
     vector<int> moves = Board::GetMoves(board);
     
     int max = (board.size - 1 - board.moves) / 2;
-    int xMove = moves[0];
+    int xMove = -1;
     if (beta > max) {
         beta = max;
         if (alpha >= beta) return { beta, -1 };

@@ -127,12 +127,12 @@ static void DrawBackground(SDL_Color bgColor, int width, int height) {
 int solve(State<7, 6>& P, bool weak = false) {
     int alpha, beta;
 
-    alpha = -1200;
-    beta = 1200;
+    alpha = -1000;
+    beta = 1000;
 
     float timeStart = SDL_GetTicks();
     // 12 is a template depth
-    pair<int, int> result = AI::Minimax(P, 12, alpha, beta);
+    pair<int, int> result = AI::Minimax(P, 2, alpha, beta);
     float timeEnd = SDL_GetTicks();
     cout << "time board:" << (timeEnd - timeStart) / 1000.0 << endl;
 
@@ -143,12 +143,89 @@ int solve(Position& P) {
     
     float timeStart = SDL_GetTicks();
 
-    pair<int, int> result = AI::Minimax(P, 12, -Position::WIDTH * Position::HEIGHT / 2, Position::WIDTH * Position::HEIGHT / 2);
+    pair<int, int> result = AI::Minimax(P, 2, -Position::WIDTH * Position::HEIGHT / 2, Position::WIDTH * Position::HEIGHT / 2);
 
     float timeEnd = SDL_GetTicks();
     cout << "time position:" << (timeEnd - timeStart) / 1000.0 << endl;
 
     return result.first;
+}
+
+int bestMove(Position& P) {
+    vector<int> moves = Board::GetMoves(mainBoard);
+    cout << "amount of moves:" << moves.size() << endl;
+    vector<int> results = vector<int>();
+    for (size_t i = 0; i < moves.size(); i++)
+    {
+        Position P2(P);
+        P2.play(moves[i]);
+        results.push_back(solve(P2));
+    }
+    int largestIndex = -1;
+    if (mainBoard.isRedTurn) {
+        int largestValue = -1000;
+        for (size_t i = 0; i < results.size(); i++)
+        {
+            cout << "move:" << moves[i] << "result:" << -results[i] << endl;
+            if (-results[i] > largestValue) {
+                largestValue = -results[i];
+                largestIndex = i;
+            }
+        }
+        cout << endl << endl;
+        return moves[largestIndex];
+    }
+    else {
+        int largestValue = 1000;
+        for (size_t i = 0; i < results.size(); i++)
+        {
+            cout << "move:" << moves[i] << "result:" << results[i] << endl;
+            if (results[i] < largestValue) {
+                largestValue = results[i];
+                largestIndex = i;
+            }
+        }
+        cout << endl << endl;
+        return moves[largestIndex];
+    }
+}
+int bestMove(State<7,6>& P) {
+    vector<int> moves = Board::GetMoves(mainBoard);
+    cout << "amount of moves:" << moves.size() << endl;
+    vector<int> results = vector<int>();
+    for (size_t i = 0; i < moves.size(); i++)
+    {
+        State<7, 6> P2 = P;
+        Board::MakeMove(P2, moves[i]);
+        results.push_back(solve(P2));
+    }
+    int largestIndex = -1;
+    if (mainBoard.isRedTurn) {
+        int largestValue = -1000;
+        for (size_t i = 0; i < results.size(); i++)
+        {
+            cout << "move:" << moves[i] << "result:" << results[i] << endl;
+            if (results[i] > largestValue) {
+                largestValue = -results[i];
+                largestIndex = i;
+            }
+        }
+        cout << endl << endl;
+        return moves[largestIndex];
+    }
+    else {
+        int largestValue = 1000;
+        for (size_t i = 0; i < results.size(); i++)
+        {
+            cout << "move:" << moves[i] << "result:" << results[i] << endl;
+            if (results[i] < largestValue) {
+                largestValue = results[i];
+                largestIndex = i;
+            }
+        }
+        cout << endl << endl;
+        return moves[largestIndex];
+    }
 }
 
 int main(int argc, char* argv[]) {
@@ -202,11 +279,11 @@ int main(int argc, char* argv[]) {
 
 #pragma endregion
 
-    Board::SetPosition(mainBoard, "");
-    mainPosition.play("");
+    Board::SetPosition(mainBoard, "7556766754744231");
+    mainPosition.play("7556766754744231");
     cout << "value of game:" << solve(mainPosition) << endl << endl;
     cout << "value of game:" << solve(mainBoard) << endl << endl;
-
+    cout << "best mvoe by position:" << bestMove(mainPosition) << endl << endl;
     while (running) {
         // Input
         SDL_GetMouseState(&mousePos.x, &mousePos.y);
@@ -227,9 +304,18 @@ int main(int argc, char* argv[]) {
                 for (size_t i = 0; i < moves.size(); i++)
                 {
                     if (moves[i] == static_cast<int>(mousePos.x / SQUARE_SIZE)) {
-                        Board::MakeMove(mainBoard, moves[i]);
+                        if (mainPosition.isWinningMove(moves[i])) {
+                            cout << "main position argued WINNER" << endl;
+                        }
+                        if (Board::MakeMove(mainBoard, moves[i])!=0) {
+                            cout << "Who Won?" << "someone.." << endl;
+                        }
+                        mainPosition.play(moves[i]);
+
                         cout << "value of game:" << solve(mainPosition) << endl << endl;
                         cout << "value of game:" << solve(mainBoard) << endl << endl;
+                        cout << "best mvoe by position:" << bestMove(mainPosition) << endl << endl;
+                        cout << "best mvoe by board:" << bestMove(mainBoard) << endl << endl;
 
                     }
                 }
